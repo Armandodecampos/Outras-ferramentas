@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Processador de Texto</title>
     <!-- Inclui a biblioteca Tailwind CSS para estilização -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Define a fonte Inter para o corpo do documento */
@@ -20,9 +21,52 @@
         .copy-message.show {
             opacity: 1;
         }
+        .voltar-tela-inicial {
+ display: flex;
+  flex-direction: row;
+    position: fixed;
+  top: 0px;
+  left: 0px;
+right:0;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  z-index: 999;
+  flex-wrap: wrap; /* Para permitir quebra de linha */
+  background:#222;
+  padding:10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  justify-content: center;
+}
+
+
+/* Estilo base compartilhado entre os botões */
+.voltar-tela-inicial button {
+  width: 50px;
+  height: 50px;
+  background: #eee;
+  border: 2px solid #000;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+}
     </style>
 </head>
 <body class="bg-gray-100 p-4">
+<div class="voltar-tela-inicial">
+   <button onclick="window.location.href='https://armandodecampos.github.io/Ferramentas-Trabalho/'">
+      <i class="fas fa-home"></i>
+    </button>
+</div>
+<br>
+<br>
+<br>
+<br>
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
         <!-- Nova seção para os botões de copiar -->
         <h2 class="text-2xl font-bold mb-4 text-gray-800">Copia e cola:</h2>
