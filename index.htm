@@ -1,0 +1,492 @@
+<!DOCTYPE ahtml>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processador de Texto</title>
+    <!-- Inclui a biblioteca Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte Inter para o corpo do documento */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Estilo para a mensagem de confirmação de cópia */
+        .copy-message {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .copy-message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+        <!-- Nova seção para os botões de copiar -->
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Copia e cola:</h2>
+        <div class="mb-6 flex justify-between space-x-2">
+            <button id="copy-btn-1" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-gray-300 transition duration-200 text-xs sm:text-sm">
+                Pessoa_21-8-2025
+            </button>
+            <button id="copy-btn-2" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-gray-300 transition duration-200 text-xs sm:text-sm">
+                Todos os registros_21-8-2025
+            </button>
+            <button id="copy-btn-3" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-gray-300 transition duration-200 text-xs sm:text-sm">
+                Todos os registros_20-8-2025_COMPLETO
+            </button>
+        </div>
+        
+        <!-- === Nova seção para o campo de texto com cache (agora no topo) === -->
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Notas:</h2>
+        <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="mb-4">
+                <label for="cache-input" class="block text-sm font-medium text-gray-700 mb-2">
+                    Digite qualquer coisa para salvar:
+                </label>
+                <textarea id="cache-input"
+                          rows="4"
+                          class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                          placeholder="Este texto será salvo automaticamente no navegador."></textarea>
+            </div>
+            <div id="cache-message" class="copy-message mt-4 text-center text-sm font-medium text-green-600">
+                Texto salvo com sucesso!
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Processador de Dados:</h2>
+
+        <!-- Área de texto para o usuário inserir os dados -->
+        <div class="mb-6">
+            <label for="text-input" class="block text-sm font-medium text-gray-700 mb-2">
+                Insira o texto para processar:
+            </label>
+            <textarea id="text-input"
+                      rows="8"
+                      class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                      placeholder="Ex:
+Unidade:
+AB-Inbev Campinas
+Visitante:
+TARCISIO GUILHERME SANTA ROSA CAMPOS - 024.759.122-00
+Telefone:
+(91) 99212-1719
+Email:
+99792125@AMBEV.COM.BR
+Horário:
+04/08/2025 02:00 - 31/08/2025 22:00
+Confirmação:
+04/08/2025 09:09"></textarea>
+        </div>
+
+        <!-- Botão para iniciar o processamento -->
+        <div class="flex space-x-4">
+            <button id="process-button"
+                    class="w-1/2 bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
+                Processar
+            </button>
+            <button id="clear-data-button"
+                    class="w-1/2 bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition duration-200">
+                Limpar
+            </button>
+        </div>
+
+
+        <!-- Seção para exibir os resultados -->
+        <div id="results-container" class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200 hidden">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Resultados:</h2>
+            <ul class="space-y-4 text-gray-700">
+                <!-- Resultado do Nome com botão de copiar -->
+                <li class="flex items-center">
+                    <strong class="font-semibold text-gray-900">Nome:</strong>
+                    <span id="name-output" class="ml-2 flex-grow"></span>
+                    <button id="copy-name-button" class="ml-4 p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-150" aria-label="Copiar nome">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </li>
+                <!-- Resultado do CPF com botão de copiar -->
+                <li class="flex items-center">
+                    <strong class="font-semibold text-gray-900">CPF:</strong>
+                    <span id="cpf-output" class="ml-2 flex-grow"></span>
+                    <button id="copy-cpf-button" class="ml-4 p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-150" aria-label="Copiar CPF">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </li>
+                <!-- Resultado do Telefone com botão de copiar -->
+                <li class="flex items-center">
+                    <strong class="font-semibold text-gray-900">Telefone:</strong>
+                    <span id="phone-output" class="ml-2 flex-grow"></span>
+                    <button id="copy-phone-button" class="ml-4 p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-150" aria-label="Copiar telefone">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </li>
+                <!-- Resultado do Email com botão de copiar -->
+                <li class="flex items-center">
+                    <strong class="font-semibold text-gray-900">Email:</strong>
+                    <span id="email-output" class="ml-2 flex-grow"></span>
+                    <button id="copy-email-button" class="ml-4 p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-150" aria-label="Copiar email">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </li>
+            </ul>
+            <!-- Mensagem de confirmação de cópia -->
+            <div id="copy-message" class="copy-message mt-4 text-center text-sm font-medium text-green-600">
+                Copiado com sucesso!
+            </div>
+        </div>
+
+        <!-- Seção para montar a frase -->
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Montar frase:</h2>
+        <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 mb-4">
+                <p class="text-gray-700 text-lg text-center md:text-left">
+                    Chegou algum email d<span id="phrase-part1" class="font-bold text-blue-600"></span> <span id="phrase-part2" class="font-bold text-blue-600"></span> solicitando liberação d<span id="phrase-part3" class="font-bold text-blue-600"></span> <span id="phrase-part4" class="font-bold text-blue-600"></span>?
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="input1" class="block text-sm font-medium text-gray-700 mb-2">
+                        Artigo do Solicitante (ex: o, a, os):
+                    </label>
+                    <input type="text" id="input1" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="Ex: o">
+                </div>
+                <div>
+                    <label for="input2" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nome do Solicitante:
+                    </label>
+                    <input type="text" id="input2" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="Ex: João">
+                </div>
+                <div>
+                    <label for="input3" class="block text-sm font-medium text-gray-700 mb-2">
+                        Artigo do Aprovador (ex: a, o, da):
+                    </label>
+                    <input type="text" id="input3" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="Ex: a">
+                </div>
+                <div>
+                    <label for="input4" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nome do Aprovador:
+                    </label>
+                    <input type="text" id="input4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="Ex: Fernanda">
+                </div>
+            </div>
+            <div class="flex space-x-4 mt-6">
+                <button id="copy-phrase-button"
+                        class="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200">
+                    Copiar Frase
+                </button>
+                <button id="clear-fields-button"
+                        class="w-full bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200">
+                    Limpar Campos
+                </button>
+            </div>
+            <!-- Mensagem de confirmação de cópia para a frase -->
+            <div id="copy-phrase-message" class="copy-message mt-4 text-center text-sm font-medium text-green-600">
+                Frase copiada com sucesso!
+            </div>
+        </div>
+
+        <!-- === Nova seção para as Notas Fixas (agora no final) === -->
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Notas Fixas - Liberação de Visitantes:</h2>
+        <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="space-y-4 text-gray-700">
+                <p><strong>Liberação pela Portaria Virtual:</strong></p>
+                <p><strong>Liberação de visitantes do Global:</strong> O anfitrião, pertencente ao time do Facilities, BP ou às bandas V, IV, III, II, I, deverá realizar o convite do visitante pelo site <a href="https://portaria-global.governarti.com.br/" class="text-blue-600 hover:underline">https://portaria-global.governarti.com.br/</a>, informando os seguintes dados:</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li>Nome completo</li>
+                    <li>CPF (ou outro documento de identidade, se estrangeiro)</li>
+                    <li>E-mail</li>
+                    <li>Telefone</li>
+                </ul>
+                <p><strong>Liberação de visitantes do BEES:</strong> O anfitrião deve enviar um e-mail para <a href="mailto:facilities.bees@ab-inbev.com" class="text-blue-600 hover:underline">facilities.bees@ab-inbev.com</a> solicitando a liberação do visitante e informando os seguintes dados:</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li>Nome completo</li>
+                    <li>CPF (ou outro documento de identidade, se estrangeiro)</li>
+                    <li>E-mail</li>
+                    <li>Telefone</li>
+                </ul>
+                <p><strong>Próximo passo:</strong> Após o envio do convite, o visitante receberá um e-mail com um link para realizar o cadastro na Portaria Virtual. Após concluir o processo, ele receberá a autorização para acessar o escritório.</p>
+            </div>
+        </div>
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Notas Fixas - Anotações e Senha:</h2>
+        <div class="mt-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="space-y-4 text-gray-700">
+                <p><strong>Código para formatar palavras em capitalização:</strong> "=PROPER(A:A)"</p>
+                <p><strong>Senha padrão da Portaria Virtual:</strong> "Ambev@2025"</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Obtém referências aos elementos HTML
+        const textInput = document.getElementById('text-input');
+        const processButton = document.getElementById('process-button');
+        const resultsContainer = document.getElementById('results-container');
+        const nameOutput = document.getElementById('name-output');
+        const cpfOutput = document.getElementById('cpf-output');
+        const phoneOutput = document.getElementById('phone-output');
+        const emailOutput = document.getElementById('email-output');
+
+        // Referências para os botões de copiar os resultados
+        const copyNameButton = document.getElementById('copy-name-button');
+        const copyCpfButton = document.getElementById('copy-cpf-button');
+        const copyPhoneButton = document.getElementById('copy-phone-button');
+        const copyEmailButton = document.getElementById('copy-email-button');
+        const copyMessage = document.getElementById('copy-message');
+
+        // Referências para os novos elementos da seção de "Montar Frase"
+        const phrasePart1 = document.getElementById('phrase-part1');
+        const phrasePart2 = document.getElementById('phrase-part2');
+        const phrasePart3 = document.getElementById('phrase-part3');
+        const phrasePart4 = document.getElementById('phrase-part4');
+        const input1 = document.getElementById('input1');
+        const input2 = document.getElementById('input2');
+        const input3 = document.getElementById('input3');
+        const input4 = document.getElementById('input4');
+        const copyPhraseButton = document.getElementById('copy-phrase-button');
+        const clearFieldsButton = document.getElementById('clear-fields-button');
+        const copyPhraseMessage = document.getElementById('copy-phrase-message');
+        
+        // Referências para os novos botões de cópia no topo
+        const copyBtn1 = document.getElementById('copy-btn-1');
+        const copyBtn2 = document.getElementById('copy-btn-2');
+        const copyBtn3 = document.getElementById('copy-btn-3');
+
+        // Referências para o novo campo de cache e sua mensagem
+        const cacheInput = document.getElementById('cache-input');
+        const cacheMessage = document.getElementById('cache-message');
+
+        // Adiciona a referência para o novo botão de limpar
+        const clearDataButton = document.getElementById('clear-data-button');
+
+        // Função para formatar a data como DD-MM-AAAA
+        const formatDate = (date) => {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        };
+
+        // Função para encontrar o dia útil anterior (sem sábados e domingos)
+        const getPreviousWorkingDay = (date) => {
+            const d = new Date(date);
+            do {
+                d.setDate(d.getDate() - 1);
+            } while (d.getDay() === 0 || d.getDay() === 6); // 0 = Domingo, 6 = Sábado
+            return d;
+        };
+        
+        // Lógica para definir os textos dos botões com base nas datas
+        window.addEventListener('load', () => {
+            const today = new Date();
+            const todayFormatted = formatDate(today);
+            const yesterday = getPreviousWorkingDay(today);
+            const yesterdayFormatted = formatDate(yesterday);
+            
+            // Atualiza o texto do primeiro botão com a data de hoje
+            copyBtn1.textContent = `Pessoa_${todayFormatted}`;
+            
+            // Atualiza o texto do segundo botão com a data de hoje
+            copyBtn2.textContent = `Todos os registros_${todayFormatted}`;
+            
+            // Atualiza o texto do terceiro botão com o dia útil anterior
+            copyBtn3.textContent = `Todos os registros_${yesterdayFormatted}_COMPLETO`;
+        });
+
+        // Função para mostrar a mensagem de sucesso
+        const showCopyMessage = (messageElement) => {
+            messageElement.classList.add('show');
+            setTimeout(() => {
+                messageElement.classList.remove('show');
+            }, 2000); // Esconde a mensagem após 2 segundos
+        };
+
+        // Função de fallback para copiar texto para a área de transferência
+        const copyToClipboard = (text, messageElement) => {
+            // Cria um elemento de área de texto temporário
+            const tempInput = document.createElement('textarea');
+            // Corrige o bug: usa .trim() para remover espaços em branco no início e no final
+            tempInput.value = text.trim();
+            document.body.appendChild(tempInput);
+            tempInput.select();
+
+            try {
+                // Tenta executar o comando de cópia
+                const success = document.execCommand('copy');
+                if (success) {
+                    showCopyMessage(messageElement);
+                } else {
+                    console.error('Falha ao copiar o texto.');
+                }
+            } catch (err) {
+                console.error('Erro ao copiar o texto:', err);
+            } finally {
+                // Remove o elemento temporário
+                document.body.removeChild(tempInput);
+            }
+        };
+
+        // Adiciona um listener de evento de clique ao botão principal
+        processButton.addEventListener('click', () => {
+            const inputText = textInput.value;
+
+            // Inicia o processamento apenas se houver texto
+            if (inputText.trim() === '') {
+                // Utiliza um elemento temporário para exibir a mensagem em vez de 'alert'
+                const tempAlert = document.createElement('div');
+                tempAlert.textContent = 'Por favor, insira o texto para processar.';
+                tempAlert.style.cssText = 'position:fixed; top:20px; right:20px; padding:10px; background-color:#ef4444; color:white; border-radius:8px; z-index:1000;';
+                document.body.appendChild(tempAlert);
+                setTimeout(() => document.body.removeChild(tempAlert), 3000);
+                return;
+            }
+
+            // Define as expressões regulares para encontrar os dados
+            const nameAndCpfRegex = /Visitante:\s*([^-\r\n]+)\s*-\s*([\d\.-]+)/;
+            const phoneRegex = /Telefone:\s*([\s\(\)\d-]+)/;
+            const emailRegex = /Email:\s*([^\s]+)/;
+
+            let extractedName = 'Não encontrado';
+            let extractedCpf = 'Não encontrado';
+            let extractedPhone = 'Não encontrado';
+            let extractedEmail = 'Não encontrado';
+
+            // Tenta encontrar e extrair o nome e o CPF
+            const nameCpfMatch = inputText.match(nameAndCpfRegex);
+            if (nameCpfMatch && nameCpfMatch.length > 2) {
+                // Remove espaços em branco do início/fim do nome
+                extractedName = nameCpfMatch[1].trim();
+                // Pega o CPF e remove todos os caracteres não-dígitos
+                extractedCpf = nameCpfMatch[2].replace(/[\D]/g, '');
+            }
+
+            // Tenta encontrar e extrair o telefone
+            const phoneMatch = inputText.match(phoneRegex);
+            if (phoneMatch && phoneMatch.length > 1) {
+                // Pega o telefone e remove todos os caracteres não-dígitos
+                extractedPhone = phoneMatch[1].replace(/[\D]/g, '');
+            }
+
+            // Tenta encontrar e extrair o email
+            const emailMatch = inputText.match(emailRegex);
+            if (emailMatch && emailMatch.length > 1) {
+                // Pega o email (já formatado corretamente)
+                extractedEmail = emailMatch[1];
+            }
+
+            // Exibe os resultados na página
+            nameOutput.textContent = extractedName;
+            cpfOutput.textContent = extractedCpf;
+            phoneOutput.textContent = extractedPhone;
+            emailOutput.textContent = extractedEmail;
+
+            // Torna o contêiner de resultados visível
+            resultsContainer.classList.remove('hidden');
+        });
+
+        // Adiciona um listener de evento de clique ao novo botão de limpar dados
+        clearDataButton.addEventListener('click', () => {
+            // Limpa o campo de texto
+            textInput.value = '';
+            // Oculta a seção de resultados
+            resultsContainer.classList.add('hidden');
+        });
+
+        // Adiciona listeners de clique aos botões de copiar os resultados
+        copyNameButton.addEventListener('click', () => {
+            copyToClipboard(nameOutput.textContent, copyMessage);
+        });
+
+        copyCpfButton.addEventListener('click', () => {
+            copyToClipboard(cpfOutput.textContent, copyMessage);
+        });
+
+        copyPhoneButton.addEventListener('click', () => {
+            copyToClipboard(phoneOutput.textContent, copyMessage);
+        });
+
+        copyEmailButton.addEventListener('click', () => {
+            copyToClipboard(emailOutput.textContent, copyMessage);
+        });
+
+        // Adiciona listeners para os novos campos de input para atualizar a frase em tempo real
+        input1.addEventListener('input', () => {
+            phrasePart1.textContent = input1.value;
+        });
+
+        input2.addEventListener('input', () => {
+            phrasePart2.textContent = input2.value;
+        });
+
+        input3.addEventListener('input', () => {
+            phrasePart3.textContent = input3.value;
+        });
+
+        input4.addEventListener('input', () => {
+            phrasePart4.textContent = input4.value;
+        });
+
+        // Adiciona um listener de clique ao botão "Copiar Frase"
+        copyPhraseButton.addEventListener('click', () => {
+            const fullPhrase = `Chegou algum email d${input1.value} ${input2.value} solicitando liberação d${input3.value} ${input4.value}?`;
+            copyToClipboard(fullPhrase, copyPhraseMessage);
+        });
+
+        // Adiciona um listener de clique ao botão "Limpar Campos"
+        clearFieldsButton.addEventListener('click', () => {
+            textInput.value = '';
+            input1.value = '';
+            input2.value = '';
+            input3.value = '';
+            input4.value = '';
+            phrasePart1.textContent = '';
+            phrasePart2.textContent = '';
+            phrasePart3.textContent = '';
+            phrasePart4.textContent = '';
+            resultsContainer.classList.add('hidden');
+        });
+
+        // Adiciona listeners para os novos botões de cópia no topo
+        copyBtn1.addEventListener('click', () => {
+            copyToClipboard(copyBtn1.textContent, copyMessage);
+        });
+        
+        copyBtn2.addEventListener('click', () => {
+            copyToClipboard(copyBtn2.textContent, copyMessage);
+        });
+
+        copyBtn3.addEventListener('click', () => {
+            copyToClipboard(copyBtn3.textContent, copyMessage);
+        });
+
+        // === Lógica para o novo campo de cache ===
+        const CACHE_KEY = 'customTextCache';
+        
+        // Carrega o texto do cache ao carregar a página
+        window.addEventListener('load', () => {
+            const cachedText = localStorage.getItem(CACHE_KEY);
+            if (cachedText) {
+                cacheInput.value = cachedText;
+            }
+        });
+
+        // Salva o texto no cache sempre que o usuário digitar
+        cacheInput.addEventListener('input', () => {
+            localStorage.setItem(CACHE_KEY, cacheInput.value);
+            showCopyMessage(cacheMessage); // Reusa a função para mostrar que foi salvo
+        });
+    </script>
+</body>
+</html>
