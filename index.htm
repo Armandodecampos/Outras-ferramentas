@@ -82,7 +82,7 @@ right:0;
                 Todos os registros_20-8-2025_COMPLETO
             </button>
         </div>
-        
+
         <!-- === Nova seção para o campo de texto com cache (agora no topo) === -->
         <h2 class="text-2xl font-bold mb-4 text-gray-800">Notas:</h2>
         <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
@@ -243,6 +243,38 @@ Confirmação:
             </div>
         </div>
 
+        <!-- Seção para montar o convite -->
+        <h2 class="text-2xl font-bold mb-4 mt-8 text-gray-800">Montar convite:</h2>
+        <div class="p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="mb-4">
+                <label for="invite-link-input" class="block text-sm font-medium text-gray-700 mb-2">
+                    Insira o link para o convite exclusivo:
+                </label>
+                <input type="text" id="invite-link-input" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="Ex: https://link-do-convite.com">
+            </div>
+            <div class="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
+                <p id="invite-preview" class="text-gray-700 whitespace-pre-line">
+Bom dia!
+
+Segue o link para o seu convite exclusivo:
+
+Caso prefira realizar a consulta manualmente, basta acessar "https://portaria-global.governarti.com.br/confirmar-visita-aberta/?unit=1" e inserir o seu CPF para localizar.
+
+Este convite é de uso pessoal e não deve ser compartilhado. Permaneço à disposição para eventuais dúvidas.
+                </p>
+            </div>
+            <div class="flex space-x-4 mt-6">
+                <button id="copy-invite-button"
+                        class="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200">
+                    Copiar Convite
+                </button>
+            </div>
+            <!-- Mensagem de confirmação de cópia para o convite -->
+            <div id="copy-invite-message" class="copy-message mt-4 text-center text-sm font-medium text-green-600">
+                Convite copiado com sucesso!
+            </div>
+        </div>
+
         <!-- === Nova seção para as Notas Fixas (agora no final) === -->
         <h2 class="text-2xl font-bold mb-4 text-gray-800">Notas Fixas - Liberação de Visitantes:</h2>
         <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
@@ -303,7 +335,13 @@ Confirmação:
         const copyPhraseButton = document.getElementById('copy-phrase-button');
         const clearFieldsButton = document.getElementById('clear-fields-button');
         const copyPhraseMessage = document.getElementById('copy-phrase-message');
-        
+
+        // Referências para os novos elementos da seção de "Montar Convite"
+        const inviteLinkInput = document.getElementById('invite-link-input');
+        const invitePreview = document.getElementById('invite-preview');
+        const copyInviteButton = document.getElementById('copy-invite-button');
+        const copyInviteMessage = document.getElementById('copy-invite-message');
+
         // Referências para os novos botões de cópia no topo
         const copyBtn1 = document.getElementById('copy-btn-1');
         const copyBtn2 = document.getElementById('copy-btn-2');
@@ -332,20 +370,20 @@ Confirmação:
             } while (d.getDay() === 0 || d.getDay() === 6); // 0 = Domingo, 6 = Sábado
             return d;
         };
-        
+
         // Lógica para definir os textos dos botões com base nas datas
         window.addEventListener('load', () => {
             const today = new Date();
             const todayFormatted = formatDate(today);
             const yesterday = getPreviousWorkingDay(today);
             const yesterdayFormatted = formatDate(yesterday);
-            
+
             // Atualiza o texto do primeiro botão com a data de hoje
             copyBtn1.textContent = `Pessoa_${todayFormatted}`;
-            
+
             // Atualiza o texto do segundo botão com a data de hoje
             copyBtn2.textContent = `Todos os registros_${todayFormatted}`;
-            
+
             // Atualiza o texto do terceiro botão com o dia útil anterior
             copyBtn3.textContent = `Todos os registros_${yesterdayFormatted}_COMPLETO`;
         });
@@ -503,11 +541,24 @@ Confirmação:
             resultsContainer.classList.add('hidden');
         });
 
+        // Adiciona listener para o novo campo de link para atualizar o convite em tempo real
+        inviteLinkInput.addEventListener('input', () => {
+            const link = inviteLinkInput.value;
+            invitePreview.textContent = `Bom dia!\n\nSegue o link para o seu convite exclusivo: ${link}\n\nCaso prefira realizar a consulta manualmente, basta acessar "https://portaria-global.governarti.com.br/confirmar-visita-aberta/?unit=1" e inserir o seu CPF para localizar.\n\nEste convite é de uso pessoal e não deve ser compartilhado. Permaneço à disposição para eventuais dúvidas.`;
+        });
+
+        // Adiciona um listener de clique ao botão "Copiar Convite"
+        copyInviteButton.addEventListener('click', () => {
+            const link = inviteLinkInput.value;
+            const fullInvite = `Bom dia!\n\nSegue o link para o seu convite exclusivo: ${link}\n\nCaso prefira realizar a consulta manualmente, basta acessar "https://portaria-global.governarti.com.br/confirmar-visita-aberta/?unit=1" e inserir o seu CPF para localizar.\n\nEste convite é de uso pessoal e não deve ser compartilhado. Permaneço à disposição para eventuais dúvidas.`;
+            copyToClipboard(fullInvite, copyInviteMessage);
+        });
+
         // Adiciona listeners para os novos botões de cópia no topo
         copyBtn1.addEventListener('click', () => {
             copyToClipboard(copyBtn1.textContent, copyMessage);
         });
-        
+
         copyBtn2.addEventListener('click', () => {
             copyToClipboard(copyBtn2.textContent, copyMessage);
         });
@@ -518,7 +569,7 @@ Confirmação:
 
         // === Lógica para o novo campo de cache ===
         const CACHE_KEY = 'customTextCache';
-        
+
         // Carrega o texto do cache ao carregar a página
         window.addEventListener('load', () => {
             const cachedText = localStorage.getItem(CACHE_KEY);
@@ -535,6 +586,3 @@ Confirmação:
     </script>
 </body>
 </html>
-
-
-
