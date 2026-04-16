@@ -546,13 +546,13 @@ Permaneço à disposição para eventuais dúvidas.
         // Adiciona listener para o novo campo de link para atualizar o convite em tempo real
         inviteLinkInput.addEventListener('input', () => {
             const link = inviteLinkInput.value;
-            invitePreview.textContent = `Bom dia!\n\nSegue o link para o seu convite exclusivo: ${link}\n\nEste convite é de uso pessoal e não deve ser compartilhado. Caso prefira realizar a consulta manualmente, basta acessar "https://portaria-global.governarti.com.br/confirmar-visita-aberta/?unit=1" e inserir o seu CPF para localizar.\n\nPermaneço à disposição para eventuais dúvidas.`;
+            invitePreview.textContent = `Bom dia!\n\nSegue o link para o seu convite exclusivo: ${link}\n\nEste convite é de uso pessoal e não deve ser compartilhado.\n\nCaso prefira realizar a consulta manualmente, basta acessar "https://portaria-global.governarti.com.br/confirmar-visita-aberta/?unit=1" e inserir o seu CPF para localizar.\n\nPermaneço à disposição para eventuais dúvidas.`;
         });
 
         // Adiciona um listener de clique ao botão "Copiar Convite"
         copyInviteButton.addEventListener('click', () => {
             const link = inviteLinkInput.value;
-            const fullInvite = `Bom dia!\n\nSegue o link para o seu convite exclusivo: ${link}\n\nEste convite é de uso pessoal e não deve ser compartilhado. Caso prefira realizar a consulta manualmente, basta acessar "https://portaria-global.governarti.com.br/confirmar-visita-aberta/?unit=1" e inserir o seu CPF para localizar.\n\nPermaneço à disposição para eventuais dúvidas.`;
+            const fullInvite = `Bom dia!\n\nSegue o link para o seu convite exclusivo: ${link}\n\nEste convite é de uso pessoal e não deve ser compartilhado.\n\nCaso prefira realizar a consulta manualmente, basta acessar "https://portaria-global.governarti.com.br/confirmar-visita-aberta/?unit=1" e inserir o seu CPF para localizar.\n\nPermaneço à disposição para eventuais dúvidas.`;
             copyToClipboard(fullInvite, copyInviteMessage);
         });
 
